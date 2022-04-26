@@ -13,7 +13,7 @@ In delivery system, FileQueue play an important role as channel like flume.
 A segment is a set of data, write block to page cache, and flush cache to one file. Detail design:
 ![image](/docs/segment_struct.png)
 
-## FilePullQueue
+## [FilePullQueue](src/main/java/org/name/zicat/queue/FilePullQueue.java)
 
 A FilePullQueue manage a set of segments include create new segments, delete expired segments, auto flush writeable segment etc.
 
@@ -21,7 +21,7 @@ Compare with kafka concepts, an instance of FilePullQueue equals to one partitio
 
 A FilePullQueue provide the management of consumer group include commit file offset and group id, get file offset by group id, restore group id on disk for persistence.
 
-## PartitionFilePullQueue
+## [PartitionFilePullQueue](src/main/java/org/name/zicat/queue/PartitionFilePullQueue.java)
 
 A PartitionFilePullQueue manage a set of FilePullQueue with partitions.
 
