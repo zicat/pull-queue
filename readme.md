@@ -4,14 +4,14 @@ PullQueue Project provide the [PullQueue](src/main/java/org/name/zicat/queue/Pul
 # Usage
 The design of PullQueue is most likely to kafka log segment supporting repeat read data from PullQueue by FileOffset and GroupId.
 
-In delivery system like flume, FileQueue play an important role as channel like flume.
+In delivery system, FileQueue play an important role as channel like flume.
 
 # Main Concepts
 
 ## [Segment](src/main/java/org/name/zicat/queue/Segment.java)
 
 A segment is a set of data, write block to page cache, and flush cache to one file. Detail design:
-![image](docs/segment_struct.png)
+![image](/docs/segment_struct.png)
 
 ## FilePullQueue
 
