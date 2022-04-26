@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<settings>
+    <localRepository />
+    <mirrors>
+        <mirror>
+            <id>aliyun-central</id>
+            <mirrorOf>central</mirrorOf>
+            <name>aliyun central</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+        </mirror>
+        <mirror>
+            <id>aliyun-jcenter</id>
+            <mirrorOf>jcenter</mirrorOf>
+            <name>aliyun jcenter</name>
+            <url>https://maven.aliyun.com/repository/jcenter</url>
+        </mirror>
+        <mirror>
+            <id>aliyun-google</id>
+            <mirrorOf>google</mirrorOf>
+            <name>aliyun google</name>
+            <url>https://maven.aliyun.com/repository/google</url>
+        </mirror>
+        <mirror>
+            <id>aliyun-spring-plugin</id>
+            <mirrorOf>spring-plugins</mirrorOf>
+            <name>aliyun spring plugins</name>
+            <url>https://maven.aliyun.com/repository/spring-plugin</url>
+        </mirror>
+    </mirrors>
+    <servers>
+        <server>
+            <id>data-repo</id>
+            <username>hongwei@agora.io</username>
+            <password>AP7vmxpcq6d486iCzoNxfFNtvCv</password>
+        </server>
+        <server>
+            <id>snapshots</id>
+            <username>hongwei@agora.io</username>
+            <password>AP7vmxpcq6d486iCzoNxfFNtvCv</password>
+        </server>
+    </servers>
+    <profiles>
+        <profile>
+            <id>agora-artifactory</id>
+            <repositories>
+                <repository>
+                    <id>data-repo</id>
+                    <name>Agora Artifactory DataPlatform Repo</name>
+                    <url>https://artifactory-api.bj2.agoralab.co/artifactory/DataPlatform-local</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories/>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>agora-artifactory</activeProfile>
+    </activeProfiles>
+</settings>
