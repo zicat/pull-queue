@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 /**
  * The BlockFileOffset maintain the block data of the File Offset.
  *
+ * @author zicat
  * @see FileOffset
  */
 public class BlockFileOffset extends FileOffset {

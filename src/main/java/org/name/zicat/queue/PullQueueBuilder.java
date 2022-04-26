@@ -21,7 +21,11 @@ package org.name.zicat.queue;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/** PullQueueBuilder. */
+/**
+ * PullQueueBuilder.
+ *
+ * @author zicat
+ */
 public class PullQueueBuilder {
 
     protected String topic;

@@ -22,7 +22,11 @@ import java.util.Iterator;
 
 import static org.name.zicat.queue.VIntUtil.readVInt;
 
-/** DataResultSet support iterator data from block. */
+/**
+ * DataResultSet support iterator data from block.
+ *
+ * @author zicat
+ */
 public class DataResultSet implements Iterator<byte[]> {
 
     private final BlockFileOffset blockFileOffset;

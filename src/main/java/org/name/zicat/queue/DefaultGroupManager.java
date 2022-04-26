@@ -40,6 +40,8 @@ import static org.name.zicat.queue.SegmentBuilder.realPrefix;
  * DefaultGroupManager use file to persist group and file offset info.
  *
  * <p>default file name : group_id_${groupId}.index.
+ *
+ * @author zicat
  */
 public class DefaultGroupManager implements GroupManager {
 

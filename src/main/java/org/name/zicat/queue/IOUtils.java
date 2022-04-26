@@ -28,7 +28,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.GatheringByteChannel;
 
-/** IOUtils. */
+/**
+ * IOUtils.
+ *
+ * @author zicat
+ */
 public class IOUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(IOUtils.class);

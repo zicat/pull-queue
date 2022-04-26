@@ -20,7 +20,11 @@ package org.name.zicat.queue;
 
 import java.io.File;
 
-/** FileLogQueueBuilder. */
+/**
+ * FileLogQueueBuilder.
+ *
+ * @author zicat
+ */
 public class FilePullQueueBuilder extends PullQueueBuilder {
 
     private File dir;

@@ -34,6 +34,8 @@ import static org.name.zicat.queue.FilePullQueue.loopCloseableFunction;
 /**
  * PartitionFilePullQueue maintain FilePull Queue list and support partition related
  * operation. @ThreadSafe
+ *
+ * @author zicat
  */
 public class PartitionFilePullQueue implements PullQueue, Closeable {
 

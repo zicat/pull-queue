@@ -28,7 +28,11 @@ import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-/** SinkThread. */
+/**
+ * SinkThread.
+ *
+ * @author zicat
+ */
 public class SinkThread extends Thread {
 
     private static final Logger LOG = LoggerFactory.getLogger(SinkThread.class);

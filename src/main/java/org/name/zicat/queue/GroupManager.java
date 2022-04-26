@@ -21,7 +21,11 @@ package org.name.zicat.queue;
 import java.io.Closeable;
 import java.io.IOException;
 
-/** GroupManager persist groupId & FileOffset, search FileOffset by groupId. @ThreadSafe */
+/**
+ * GroupManager persist groupId & FileOffset, search FileOffset by groupId. @ThreadSafe
+ *
+ * @author zicat
+ */
 public interface GroupManager extends Closeable {
 
     /**

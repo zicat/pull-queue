@@ -21,7 +21,11 @@ package org.name.zicat.queue;
 import java.io.File;
 import java.util.List;
 
-/** PartitionFilePullQueueBuilder. */
+/**
+ * PartitionFilePullQueueBuilder.
+ *
+ * @author zicat
+ */
 public class PartitionFilePullQueueBuilder extends PullQueueBuilder {
 
     private List<File> dirs;

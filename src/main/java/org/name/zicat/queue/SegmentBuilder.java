@@ -30,7 +30,11 @@ import java.nio.channels.FileChannel;
 
 import static org.name.zicat.queue.IOUtils.*;
 
-/** SegmentBuilder. */
+/**
+ * SegmentBuilder.
+ *
+ * @author zicat
+ */
 public class SegmentBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(SegmentBuilder.class);

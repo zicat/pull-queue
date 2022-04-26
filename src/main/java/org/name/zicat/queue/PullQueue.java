@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * A PullQueue support append data to queue with partition, flush block and page cache data to disk,
  * pull data from queue by BlockFileOffset. @ThreadSafe
+ *
+ * @author zicat
  */
 public interface PullQueue extends Closeable, PullQueueMeta {
 

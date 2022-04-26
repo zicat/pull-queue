@@ -20,7 +20,11 @@ package org.name.zicat.queue;
 
 import java.nio.ByteBuffer;
 
-/** VIntUtil. */
+/**
+ * VIntUtil.
+ *
+ * @author zicat
+ */
 public class VIntUtil {
 
     public static final int VINT_1_BYTE_LIMIT = (1 << 7);

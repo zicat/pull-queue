@@ -40,9 +40,9 @@ import static org.name.zicat.queue.SegmentBuilder.getIdByName;
 import static org.name.zicat.queue.SegmentBuilder.isSegment;
 
 /**
- * FilePullQueue to Storage data in file.
+ * FilePullQueue to Storage data in file. @ThreadSafe
  *
- * <p>@ThreadSafe
+ * @author zicat
  */
 public class FilePullQueue implements PullQueue, Closeable {
 

@@ -26,7 +26,11 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Random;
 
-/** ConsumerThread. */
+/**
+ * ConsumerThread.
+ *
+ * @author zicat
+ */
 public class SourceThread extends Thread {
 
     private static final Logger LOG = LoggerFactory.getLogger(SourceThread.class);

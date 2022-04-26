@@ -24,7 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-/** Sink. */
+/**
+ * Sink.
+ *
+ * @author zicat
+ */
 public class SinkGroup extends Thread {
 
     private final int partitionCount;

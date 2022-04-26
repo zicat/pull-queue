@@ -45,6 +45,8 @@ import static org.name.zicat.queue.VIntUtil.vIntLength;
  * <p>block:|4 bytes blockSize|record1|record2|......|
  *
  * <p>one record:|vint record length|record value|
+ *
+ * @author zicat
  */
 public final class Segment implements Closeable, Comparable<Segment> {
 

@@ -20,7 +20,11 @@ package org.name.zicat.queue;
 
 import java.nio.ByteBuffer;
 
-/** The File Offset maintain the position of one record(or block) in File Queue. */
+/**
+ * The File Offset maintain the position of one record(or block) in File Queue.
+ *
+ * @author zicat
+ */
 public class FileOffset implements Comparable<FileOffset> {
 
     private final long fileId;

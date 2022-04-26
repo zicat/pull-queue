@@ -34,7 +34,11 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-/** Test. */
+/**
+ * Test.
+ *
+ * @author zicat
+ */
 public class FilePullQueueTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(FilePullQueueTest.class);
