@@ -21,7 +21,7 @@ package org.name.zicat.queue;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/** FileLogQueueBuilder. */
+/** PullQueueBuilder. */
 public class PullQueueBuilder {
 
     protected String topic;
@@ -47,7 +47,7 @@ public class PullQueueBuilder {
      * set compression type.
      *
      * @param compressionType compressionType
-     * @return LogSegmentBuilder
+     * @return PullQueueBuilder
      */
     public PullQueueBuilder compressionType(SegmentBuilder.CompressionType compressionType) {
         if (compressionType != null) {

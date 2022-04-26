@@ -91,7 +91,7 @@ public final class Segment implements Closeable, Comparable<Segment> {
     }
 
     /**
-     * append bytes to log segment.
+     * append bytes to segment.
      *
      * @param data data
      * @param offset offset
@@ -160,7 +160,7 @@ public final class Segment implements Closeable, Comparable<Segment> {
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    public LogResultSet readBlock(BlockFileOffset fileOffset, long time, TimeUnit unit)
+    public DataResultSet readBlock(BlockFileOffset fileOffset, long time, TimeUnit unit)
             throws IOException, InterruptedException {
 
         checkOpen();
@@ -179,10 +179,10 @@ public final class Segment implements Closeable, Comparable<Segment> {
                 if (time == 0) {
                     readable.await();
                 } else if (!readable.await(time, unit)) {
-                    return new LogResultSet(fileOffset, 0);
+                    return new DataResultSet(fileOffset, 0);
                 }
             } else if (offset >= readablePosition()) {
-                return new LogResultSet(fileOffset, 0);
+                return new DataResultSet(fileOffset, 0);
             }
         } finally {
             lock.unlock();
@@ -197,7 +197,7 @@ public final class Segment implements Closeable, Comparable<Segment> {
      * @return return current fileOffset if reach read position , else return data
      * @throws IOException IOException
      */
-    private LogResultSet read(long offset, BlockFileOffset fileOffset) throws IOException {
+    private DataResultSet read(long offset, BlockFileOffset fileOffset) throws IOException {
 
         final ByteBuffer reusedDataLengthBuffer =
                 reAllocate(fileOffset.getReusedDataLengthBuffer(), BLOCK_HEAD_SIZE);
@@ -219,7 +219,7 @@ public final class Segment implements Closeable, Comparable<Segment> {
                         compressionType.decompression(reusedDataBodyBuffer),
                         reusedDataBodyBuffer,
                         reusedDataLengthBuffer);
-        return new LogResultSet(blockFileOffset, limit + BLOCK_HEAD_SIZE);
+        return new DataResultSet(blockFileOffset, limit + BLOCK_HEAD_SIZE);
     }
 
     /**
@@ -309,7 +309,7 @@ public final class Segment implements Closeable, Comparable<Segment> {
     }
 
     /**
-     * set log segment as not writeable, but read is allow.
+     * set segment as not writeable, but read is allow.
      *
      * @throws IOException IOException
      */

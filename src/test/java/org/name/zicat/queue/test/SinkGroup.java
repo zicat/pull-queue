@@ -45,7 +45,7 @@ public class SinkGroup extends Thread {
 
         List<Thread> sinkThreads = new ArrayList<>(partitionCount);
         for (int j = 0; j < partitionCount; j++) {
-            // register group id to log queue and start consumer each partition
+            // register group id to queue and start consumer each partition
             sinkThreads.add(new SinkThread(queue, j, groupName, consumerCount, totalSize));
         }
         sinkThreads.forEach(Thread::start);

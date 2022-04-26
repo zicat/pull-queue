@@ -37,10 +37,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 import static org.name.zicat.queue.SegmentBuilder.getIdByName;
-import static org.name.zicat.queue.SegmentBuilder.isLogSegment;
+import static org.name.zicat.queue.SegmentBuilder.isSegment;
 
 /**
- * FileLogQueue to Storage data in file.
+ * FilePullQueue to Storage data in file.
  *
  * <p>@ThreadSafe
  */
@@ -102,10 +102,10 @@ public class FilePullQueue implements PullQueue, Closeable {
 
     /** load segments. */
     private void loadSegments() {
-        final File[] files = dir.listFiles(file -> isLogSegment(topic, file.getName()));
+        final File[] files = dir.listFiles(file -> isSegment(topic, file.getName()));
         if (files == null || files.length == 0) {
             // create new log segment if dir is empty, start id = 0
-            this.lastSegment = createLogSegment(0);
+            this.lastSegment = createSegment(0);
             return;
         }
 
@@ -116,7 +116,7 @@ public class FilePullQueue implements PullQueue, Closeable {
                                 file -> {
                                     final String fileName = file.getName();
                                     final long id = getIdByName(topic, fileName);
-                                    return createLogSegment(id);
+                                    return createSegment(id);
                                 })
                         .max(Segment::compareTo)
                         .get();
@@ -139,9 +139,9 @@ public class FilePullQueue implements PullQueue, Closeable {
      * create segment by id.
      *
      * @param id id
-     * @return LogSegment
+     * @return Segment
      */
-    private Segment createLogSegment(long id) {
+    private Segment createSegment(long id) {
         final Segment segment =
                 new SegmentBuilder()
                         .fileId(id)
@@ -161,15 +161,15 @@ public class FilePullQueue implements PullQueue, Closeable {
     }
 
     /**
-     * append log data without partition.
+     * append data without partition.
      *
-     * @param log log
+     * @param data data
      * @throws IOException IOException
      */
-    private void appendIgnorePartition(byte[] log, int offset, int length) throws IOException {
+    private void appendIgnorePartition(byte[] data, int offset, int length) throws IOException {
 
         final Segment segment = this.lastSegment;
-        if (segment.append(log, offset, length) != -1) {
+        if (segment.append(data, offset, length) != -1) {
             checkSyncForce(segment);
         } else {
             final ReentrantLock lock = this.lock;
@@ -177,10 +177,10 @@ public class FilePullQueue implements PullQueue, Closeable {
             try {
                 segment.finish();
                 final Segment retrySegment = this.lastSegment;
-                if (retrySegment.append(log, offset, length) == -1) {
+                if (retrySegment.append(data, offset, length) == -1) {
                     retrySegment.finish();
-                    final Segment newSegment = createLogSegment(retrySegment.fileId() + 1L);
-                    newSegment.append(log, offset, length);
+                    final Segment newSegment = createSegment(retrySegment.fileId() + 1L);
+                    newSegment.append(data, offset, length);
                     writeBytes.addAndGet(lastSegment.readablePosition());
                     this.lastSegment = newSegment;
                     newSegmentCondition.signalAll();
@@ -223,9 +223,9 @@ public class FilePullQueue implements PullQueue, Closeable {
     }
 
     @Override
-    public LogResultSet poll(int partition, BlockFileOffset fileOffset, long time, TimeUnit unit)
+    public DataResultSet poll(int partition, BlockFileOffset offset, long time, TimeUnit unit)
             throws IOException, InterruptedException {
-        final LogResultSet resultSet = read(fileOffset, time, unit);
+        final DataResultSet resultSet = read(offset, time, unit);
         readBytes.addAndGet(resultSet.readBytes());
         return resultSet;
     }
@@ -251,7 +251,7 @@ public class FilePullQueue implements PullQueue, Closeable {
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    private LogResultSet read(BlockFileOffset fileOffset, long time, TimeUnit unit)
+    private DataResultSet read(BlockFileOffset fileOffset, long time, TimeUnit unit)
             throws IOException, InterruptedException {
 
         final Segment currentSegment = this.lastSegment;
@@ -264,7 +264,7 @@ public class FilePullQueue implements PullQueue, Closeable {
             throw new IOException("segment not found segment id = " + realFileOffset.fileId());
         }
         // try read it first
-        final LogResultSet resultBuffer = searchSegment.readBlock(realFileOffset, time, unit);
+        final DataResultSet resultBuffer = searchSegment.readBlock(realFileOffset, time, unit);
         if (!searchSegment.isFinish() || resultBuffer.hasNext()) {
             return resultBuffer;
         }
@@ -278,7 +278,7 @@ public class FilePullQueue implements PullQueue, Closeable {
                 if (time == 0) {
                     newSegmentCondition.await();
                 } else if (!newSegmentCondition.await(time, unit)) {
-                    return new LogResultSet(realFileOffset, 0);
+                    return new DataResultSet(realFileOffset, 0);
                 }
             }
         } finally {

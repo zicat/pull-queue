@@ -18,7 +18,7 @@
 
 package org.name.zicat.queue;
 
-/** LogQueueMeta support get runtime metrics and static metrics. */
+/** PullQueueMeta support get runtime metrics and static metrics. */
 public interface PullQueueMeta {
 
     /**

@@ -45,7 +45,7 @@ public class FilePullQueueBuilder extends PullQueueBuilder {
                     "dir not exist and try to create fail " + dir.getPath());
         }
         if (consumerGroups == null || consumerGroups.isEmpty()) {
-            throw new IllegalStateException("file log queue must has at least one consumer group");
+            throw new IllegalStateException("file pull queue must has at least one consumer group");
         }
         return new FilePullQueue(
                 topic,
@@ -62,7 +62,7 @@ public class FilePullQueueBuilder extends PullQueueBuilder {
     }
 
     /**
-     * build file log queue.
+     * build file pull queue.
      *
      * @return return
      */

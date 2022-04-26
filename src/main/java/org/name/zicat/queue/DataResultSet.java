@@ -22,14 +22,14 @@ import java.util.Iterator;
 
 import static org.name.zicat.queue.VIntUtil.readVInt;
 
-/** LogResult support iterator data from block. */
-public class LogResultSet implements Iterator<byte[]> {
+/** DataResultSet support iterator data from block. */
+public class DataResultSet implements Iterator<byte[]> {
 
     private final BlockFileOffset blockFileOffset;
     private volatile byte[] nextData;
     private final long readBytes;
 
-    public LogResultSet(BlockFileOffset blockFileOffset, long readBytes) {
+    public DataResultSet(BlockFileOffset blockFileOffset, long readBytes) {
         this.blockFileOffset = blockFileOffset;
         this.readBytes = readBytes;
         next();

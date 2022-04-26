@@ -53,7 +53,7 @@ public class FilePullQueueTest {
         pullQueue.append(0, value.getBytes(StandardCharsets.UTF_8));
         pullQueue.flush();
         BlockFileOffset offset = pullQueue.getFileOffset(groupId, 0);
-        LogResultSet resultSet = pullQueue.take(0, offset);
+        DataResultSet resultSet = pullQueue.take(0, offset);
         Assert.assertTrue(resultSet.hasNext());
         Assert.assertEquals(value, new String(resultSet.next(), StandardCharsets.UTF_8));
         Assert.assertFalse(resultSet.hasNext());
@@ -161,7 +161,7 @@ public class FilePullQueueTest {
                     new Thread(
                             () -> {
                                 BlockFileOffset fileOffset = pullQueue.getFileOffset(groupId, 0);
-                                LogResultSet result;
+                                DataResultSet result;
                                 int readSize = 0;
                                 while (readSize < dataSize * writeThread) {
                                     try {

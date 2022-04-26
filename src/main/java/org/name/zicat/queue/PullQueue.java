@@ -29,16 +29,16 @@ import java.util.concurrent.TimeUnit;
 public interface PullQueue extends Closeable, PullQueueMeta {
 
     /**
-     * append log to queue.
+     * append data to queue.
      *
-     * <p>append operator only make sure put log to memory block or page cache.
+     * <p>append operator only make sure put data to memory block or page cache.
      *
      * <p>invoke {@link PullQueue#flush()} will flush data from memory block and page cache to disk.
      *
      * @param partition partition
      * @param data data
-     * @param offset offset the log offset
-     * @param length length the log length to append
+     * @param offset offset the data offset
+     * @param length length the data length to append
      * @throws IOException IOException
      */
     void append(int partition, byte[] data, int offset, int length) throws IOException;
@@ -50,31 +50,31 @@ public interface PullQueue extends Closeable, PullQueueMeta {
     }
 
     /**
-     * poll log.
+     * poll data.
      *
      * @param partition partition
-     * @param logOffset logOffset
+     * @param offset offset
      * @param time time
      * @param unit unit
-     * @return LogResultSet
+     * @return DataResultSet
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    LogResultSet poll(int partition, BlockFileOffset logOffset, long time, TimeUnit unit)
+    DataResultSet poll(int partition, BlockFileOffset offset, long time, TimeUnit unit)
             throws IOException, InterruptedException;
 
     /**
-     * read log. waiting if necessary * until an element becomes available.
+     * read data. waiting if necessary * until an element becomes available.
      *
      * @param partition the partition to read
-     * @param logOffset logOffset
-     * @return LogResultSet
+     * @param offset offset
+     * @return DataResultSet
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    default LogResultSet take(int partition, BlockFileOffset logOffset)
+    default DataResultSet take(int partition, BlockFileOffset offset)
             throws IOException, InterruptedException {
-        return poll(partition, logOffset, 0, TimeUnit.MILLISECONDS);
+        return poll(partition, offset, 0, TimeUnit.MILLISECONDS);
     }
 
     /**

@@ -19,7 +19,7 @@
 package org.name.zicat.queue.test;
 
 import org.name.zicat.queue.BlockFileOffset;
-import org.name.zicat.queue.LogResultSet;
+import org.name.zicat.queue.DataResultSet;
 import org.name.zicat.queue.PullQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class SinkThread extends Thread {
 
         try {
             BlockFileOffset fileOffset = queue.getFileOffset(groupName, partitionId);
-            LogResultSet result = null;
+            DataResultSet result = null;
             long readLength = 0;
             long start = System.currentTimeMillis();
             DecimalFormat df = new DecimalFormat("######0.00");

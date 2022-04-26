@@ -30,7 +30,7 @@ import java.nio.channels.FileChannel;
 
 import static org.name.zicat.queue.IOUtils.*;
 
-/** LogSegmentBuilder. */
+/** SegmentBuilder. */
 public class SegmentBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(SegmentBuilder.class);
@@ -50,7 +50,7 @@ public class SegmentBuilder {
      * set file id.
      *
      * @param fileId fileId
-     * @return LogSegmentBuilder
+     * @return SegmentBuilder
      */
     public SegmentBuilder fileId(long fileId) {
         this.fileId = fileId;
@@ -61,7 +61,7 @@ public class SegmentBuilder {
      * set compression type.
      *
      * @param compressionType compressionType
-     * @return LogSegmentBuilder
+     * @return SegmentBuilder
      */
     public SegmentBuilder compressionType(CompressionType compressionType) {
         if (compressionType != null) {
@@ -74,7 +74,7 @@ public class SegmentBuilder {
      * set file prefix.
      *
      * @param filePrefix filePrefix
-     * @return LogSegmentBuilder
+     * @return SegmentBuilder
      */
     public SegmentBuilder filePrefix(String filePrefix) {
         this.filePrefix = filePrefix;
@@ -85,7 +85,7 @@ public class SegmentBuilder {
      * set block size.
      *
      * @param blockSize blockSize.
-     * @return LogSegmentBuilder
+     * @return SegmentBuilder
      */
     public SegmentBuilder blockSize(Integer blockSize) {
         if (blockSize != null) {
@@ -98,7 +98,7 @@ public class SegmentBuilder {
      * set segment size.
      *
      * @param segmentSize segmentSize
-     * @return LogSegmentBuilder
+     * @return SegmentBuilder
      */
     public SegmentBuilder segmentSize(Long segmentSize) {
         if (segmentSize != null) {
@@ -111,7 +111,7 @@ public class SegmentBuilder {
      * set dir.
      *
      * @param dir dir
-     * @return LogSegmentBuilder
+     * @return SegmentBuilder
      */
     public SegmentBuilder dir(File dir) {
         this.dir = dir;
@@ -119,9 +119,9 @@ public class SegmentBuilder {
     }
 
     /**
-     * build log segment.
+     * build segment.
      *
-     * @return LogSegment
+     * @return Segment
      */
     public Segment build(ByteBufferTuple byteBufferTuple) {
         if (fileId == null) {
@@ -170,7 +170,7 @@ public class SegmentBuilder {
         } catch (IOException e) {
             IOUtils.closeQuietly(fileChannel);
             IOUtils.closeQuietly(randomAccessFile);
-            throw new RuntimeException("create log segment error, file path " + file.getPath(), e);
+            throw new RuntimeException("create segment error, file path " + file.getPath(), e);
         }
     }
 
@@ -343,12 +343,12 @@ public class SegmentBuilder {
     }
 
     /**
-     * check file is log file.
+     * check file is segment.
      *
      * @param fileName fileName
-     * @return true if log segment else false
+     * @return true if segment else false
      */
-    public static boolean isLogSegment(String filePrefix, String fileName) {
+    public static boolean isSegment(String filePrefix, String fileName) {
         if (!fileName.startsWith(realPrefix(filePrefix, FILE_DEFAULT_PREFIX))
                 || !fileName.endsWith(FILE_DEFAULT_SUFFIX)) {
             return false;

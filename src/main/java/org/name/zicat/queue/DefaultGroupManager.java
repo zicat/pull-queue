@@ -189,7 +189,7 @@ public class DefaultGroupManager implements GroupManager {
     /** check whether closed. */
     private void isOpen() {
         if (closed.get()) {
-            throw new IllegalStateException("DefaultFileLogQueueManager is closed");
+            throw new IllegalStateException("DefaultGroupManager is closed");
         }
     }
 

@@ -88,7 +88,7 @@ public class PartitionFilePullQueue implements PullQueue, Closeable {
                     try {
                         flush();
                     } catch (Exception e) {
-                        LOG.warn("period flush log queue error", e);
+                        LOG.warn("period flush file pull queue error", e);
                     }
                     return null;
                 },
@@ -100,8 +100,8 @@ public class PartitionFilePullQueue implements PullQueue, Closeable {
     protected void cleanUp() {
         loopCloseableFunction(
                 t -> {
-                    for (FilePullQueue logQueue : pullQueues) {
-                        logQueue.cleanUp();
+                    for (FilePullQueue queue : pullQueues) {
+                        queue.cleanUp();
                     }
                     return null;
                 },
@@ -116,10 +116,10 @@ public class PartitionFilePullQueue implements PullQueue, Closeable {
     }
 
     @Override
-    public LogResultSet poll(int partition, BlockFileOffset logOffset, long time, TimeUnit unit)
+    public DataResultSet poll(int partition, BlockFileOffset offset, long time, TimeUnit unit)
             throws IOException, InterruptedException {
         final FilePullQueue queue = getPartitionQueue(partition);
-        return queue.poll(partition, logOffset, time, unit);
+        return queue.poll(partition, offset, time, unit);
     }
 
     @Override
