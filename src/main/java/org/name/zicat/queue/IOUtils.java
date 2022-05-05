@@ -44,19 +44,20 @@ public class IOUtils {
      * @return byteBuffer
      * @throws IOException IOException
      */
-    public static ByteBuffer compressionSnappy(ByteBuffer byteBuffer) throws IOException {
+    public static ByteBuffer compressionSnappy(ByteBuffer byteBuffer, ByteBuffer compressionBlock)
+            throws IOException {
         final int size = byteBuffer.remaining();
-        final byte[] buf = new byte[Snappy.maxCompressedLength(size)];
+        final int maxCompressedLength = Snappy.maxCompressedLength(size);
         if (byteBuffer.hasArray()) {
+            final byte[] buf = new byte[maxCompressedLength];
             final int compressedByteSize =
                     Snappy.rawCompress(byteBuffer.array(), byteBuffer.position(), size, buf, 0);
-            return ByteBuffer.wrap(buf, 0, compressedByteSize);
+            compressionBlock = IOUtils.reAllocate(compressionBlock, compressedByteSize);
+            return compressionBlock.put(buf);
         } else {
-            final byte[] originBytes = new byte[size];
-            byteBuffer.get(originBytes);
-            final int compressedByteSize =
-                    Snappy.rawCompress(originBytes, 0, originBytes.length, buf, 0);
-            return ByteBuffer.wrap(buf, 0, compressedByteSize);
+            compressionBlock = IOUtils.reAllocate(compressionBlock, maxCompressedLength);
+            Snappy.compress(byteBuffer, compressionBlock);
+            return compressionBlock;
         }
     }
 
@@ -67,22 +68,21 @@ public class IOUtils {
      * @return byteBuffer
      * @throws IOException IOException
      */
-    public static ByteBuffer decompressionSnappy(ByteBuffer byteBuffer) throws IOException {
-        final int dataSize = byteBuffer.remaining();
-        byte[] result;
+    public static ByteBuffer decompressionSnappy(ByteBuffer byteBuffer, ByteBuffer compressionBlock)
+            throws IOException {
         if (byteBuffer.hasArray()) {
+            final int dataSize = byteBuffer.remaining();
             int size =
                     Snappy.uncompressedLength(byteBuffer.array(), byteBuffer.position(), dataSize);
-            result = new byte[size];
+            byte[] result = new byte[size];
             Snappy.uncompress(byteBuffer.array(), 0, dataSize, result, 0);
+            return ByteBuffer.wrap(result);
         } else {
-            final byte[] originBytes = new byte[dataSize];
-            byteBuffer.get(originBytes);
-            int size = Snappy.uncompressedLength(originBytes);
-            result = new byte[size];
-            Snappy.uncompress(originBytes, 0, originBytes.length, result, 0);
+            int uncompressedLength = Snappy.uncompressedLength(byteBuffer);
+            compressionBlock = IOUtils.reAllocate(compressionBlock, uncompressedLength);
+            Snappy.uncompress(byteBuffer, compressionBlock);
+            return compressionBlock;
         }
-        return ByteBuffer.wrap(result);
     }
 
     /**

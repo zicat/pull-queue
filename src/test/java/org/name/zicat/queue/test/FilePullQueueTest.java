@@ -317,7 +317,7 @@ public class FilePullQueueTest {
                 blockSize,
                 7,
                 TimeUnit.SECONDS,
-                SegmentBuilder.CompressionType.ZSTD);
+                SegmentBuilder.CompressionType.SNAPPY);
     }
 
     public static PullQueue createQueue(

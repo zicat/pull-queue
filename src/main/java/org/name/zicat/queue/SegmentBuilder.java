@@ -127,7 +127,7 @@ public class SegmentBuilder {
      *
      * @return Segment
      */
-    public Segment build(ByteBufferTuple byteBufferTuple) {
+    public Segment build(BlockSet blockSet) {
         if (fileId == null) {
             throw new NullPointerException("segment file id is null");
         }
@@ -167,7 +167,7 @@ public class SegmentBuilder {
                     fileId,
                     file,
                     fileChannel,
-                    byteBufferTuple.reAllocate(blockSize),
+                    blockSet.reAllocate(blockSize),
                     segmentSize,
                     compressionType,
                     position);
@@ -175,44 +175,6 @@ public class SegmentBuilder {
             IOUtils.closeQuietly(fileChannel);
             IOUtils.closeQuietly(randomAccessFile);
             throw new RuntimeException("create segment error, file path " + file.getPath(), e);
-        }
-    }
-
-    /** ByteBufferTuple. */
-    public static class ByteBufferTuple {
-
-        private ByteBuffer writeBlock;
-        private ByteBuffer reusedBuffer;
-        private int blockSize;
-
-        public ByteBufferTuple(int blockSize) {
-            this.blockSize = blockSize;
-            this.writeBlock = ByteBuffer.allocateDirect(blockSize);
-            this.reusedBuffer = ByteBuffer.allocateDirect(blockSize + BLOCK_HEAD_SIZE);
-        }
-
-        public ByteBuffer writeBlock() {
-            return writeBlock;
-        }
-
-        public ByteBuffer reusedBuffer() {
-            return reusedBuffer;
-        }
-
-        public int blockSize() {
-            return blockSize;
-        }
-
-        public ByteBuffer reusedBuffer(ByteBuffer newBuffer) {
-            this.reusedBuffer = newBuffer;
-            return newBuffer;
-        }
-
-        public ByteBufferTuple reAllocate(int blockSize) {
-            this.blockSize = blockSize;
-            this.writeBlock = IOUtils.reAllocate(writeBlock, blockSize);
-            this.reusedBuffer = IOUtils.reAllocate(reusedBuffer, blockSize + BLOCK_HEAD_SIZE);
-            return this;
         }
     }
 
@@ -280,13 +242,14 @@ public class SegmentBuilder {
          * @param byteBuffer byteBuffer
          * @return byteBuffer
          */
-        public ByteBuffer compression(ByteBuffer byteBuffer) throws IOException {
+        public ByteBuffer compression(ByteBuffer byteBuffer, ByteBuffer compressionBlock)
+                throws IOException {
             if (this == ZSTD) {
                 return Zstd.compress(byteBuffer, 3);
             } else if (this == NONE) {
                 return byteBuffer;
             } else if (this == SNAPPY) {
-                return compressionSnappy(byteBuffer);
+                return compressionSnappy(byteBuffer, compressionBlock);
             } else {
                 throw new IllegalStateException("compression type not found, id " + getId());
             }
@@ -298,14 +261,15 @@ public class SegmentBuilder {
          * @param byteBuffer byteBuffer
          * @return byteBuffer
          */
-        public ByteBuffer decompression(ByteBuffer byteBuffer) throws IOException {
+        public ByteBuffer decompression(ByteBuffer byteBuffer, ByteBuffer compressionBlock)
+                throws IOException {
             if (this == ZSTD) {
                 int size = (int) Zstd.decompressedSize(byteBuffer.duplicate());
                 return Zstd.decompress(byteBuffer, size);
             } else if (this == NONE) {
                 return byteBuffer;
             } else if (this == SNAPPY) {
-                return decompressionSnappy(byteBuffer);
+                return decompressionSnappy(byteBuffer, compressionBlock);
             } else {
                 throw new IllegalStateException("compression type not found, id " + getId());
             }

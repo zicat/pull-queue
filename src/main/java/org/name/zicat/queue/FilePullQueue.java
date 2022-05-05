@@ -63,7 +63,7 @@ public class FilePullQueue implements PullQueue, Closeable {
     private Thread flushSegmentThread;
     private final String topic;
     private final long flushPageCacheSize;
-    private final SegmentBuilder.ByteBufferTuple byteBufferTuple;
+    private final BlockSet blockSet;
     private final AtomicLong writeBytes = new AtomicLong();
     private final AtomicLong readBytes = new AtomicLong();
 
@@ -82,7 +82,7 @@ public class FilePullQueue implements PullQueue, Closeable {
         this.topic = topic;
         this.dir = dir;
         this.blockSize = blockSize;
-        this.byteBufferTuple = new SegmentBuilder.ByteBufferTuple(blockSize);
+        this.blockSet = new BlockSet(blockSize);
         this.segmentSize = segmentSize;
         this.compressionType = compressionType;
         this.groupManager = groupManager;
@@ -150,7 +150,7 @@ public class FilePullQueue implements PullQueue, Closeable {
                         .segmentSize(segmentSize)
                         .filePrefix(topic)
                         .compressionType(compressionType)
-                        .build(byteBufferTuple);
+                        .build(blockSet);
         segmentCache.put(id, segment);
         return segment;
     }

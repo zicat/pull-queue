@@ -61,34 +61,30 @@ public final class Segment implements Closeable, Comparable<Segment> {
     private final Condition readable = lock.newCondition();
     private final AtomicLong readablePosition = new AtomicLong();
     private final AtomicBoolean finished = new AtomicBoolean(false);
-    private final SegmentBuilder.ByteBufferTuple byteBufferTuple;
-    private final ByteBuffer writeBlock;
-    private ByteBuffer reusedBuffer;
+    private final BlockSet blockSet;
     private long pageCacheUsed = 0;
 
     public Segment(
             long id,
             File file,
             FileChannel fileChannel,
-            SegmentBuilder.ByteBufferTuple byteBufferTuple,
+            BlockSet blockSet,
             long segmentSize,
             SegmentBuilder.CompressionType compressionType,
             long position) {
-        if (segmentSize - SEGMENT_HEAD_SIZE < byteBufferTuple.blockSize()) {
+        if (segmentSize - SEGMENT_HEAD_SIZE < blockSet.blockSize()) {
             throw new IllegalArgumentException(
                     "segment size must over block size, segment size = "
                             + segmentSize
                             + ",block size = "
-                            + byteBufferTuple.blockSize());
+                            + blockSet.blockSize());
         }
         this.id = id;
         this.file = file;
         this.fileChannel = fileChannel;
         this.segmentSize = segmentSize;
         this.compressionType = compressionType;
-        this.byteBufferTuple = byteBufferTuple;
-        this.writeBlock = byteBufferTuple.writeBlock();
-        this.reusedBuffer = byteBufferTuple.reusedBuffer();
+        this.blockSet = blockSet;
         this.readablePosition.set(position);
     }
 
@@ -115,22 +111,21 @@ public final class Segment implements Closeable, Comparable<Segment> {
             if (isFinish()) {
                 return -1;
             }
-            if (writeBlock.remaining() < dataLength) {
-                if (writeBlock.position() != 0) {
-                    writeBlock.flip();
-                    encodeBlockAndWriteChannel(writeBlock, reusedBuffer);
-                    writeBlock.clear();
+            if (blockSet.writeBlock().remaining() < dataLength) {
+                if (blockSet.writeBlock().position() != 0) {
+                    encodeBlockSetAndWriterChannel();
                 }
                 if (readablePosition() > segmentSize) {
                     return -1;
                 }
             }
-            if (writeBlock.remaining() >= dataLength) {
-                encodeData(writeBlock, data, offset, length);
+            if (blockSet.writeBlock().remaining() >= dataLength) {
+                encodeData(blockSet.writeBlock(), data, offset, length);
             } else {
                 final ByteBuffer bigRecordBuffer = ByteBuffer.allocateDirect(dataLength);
                 encodeData(bigRecordBuffer, data, offset, length).flip();
-                encodeBlockAndWriteChannel(bigRecordBuffer, reusedBuffer);
+                encodeBlockAndWriteChannel(
+                        bigRecordBuffer, blockSet.compressionBlock(), blockSet.encodeBlock());
             }
         } finally {
             lock.unlock();
@@ -218,7 +213,8 @@ public final class Segment implements Closeable, Comparable<Segment> {
                 new BlockFileOffset(
                         fileId(),
                         offset + reusedDataBodyBuffer.limit(),
-                        compressionType.decompression(reusedDataBodyBuffer),
+                        compressionType.decompression(
+                                reusedDataBodyBuffer, fileOffset.getDataBuffer()),
                         reusedDataBodyBuffer,
                         reusedDataLengthBuffer);
         return new DataResultSet(blockFileOffset, limit + BLOCK_HEAD_SIZE);
@@ -239,20 +235,36 @@ public final class Segment implements Closeable, Comparable<Segment> {
      * encode block.
      *
      * @param byteBuffer byteBuffer
-     * @param reusedBuffer reusedBuffer
+     * @param compressionBlock compressionBlock
+     * @param encodeBlock encodeBlock
      */
-    private void encodeBlockAndWriteChannel(ByteBuffer byteBuffer, ByteBuffer reusedBuffer)
+    private void encodeBlockAndWriteChannel(
+            ByteBuffer byteBuffer, ByteBuffer compressionBlock, ByteBuffer encodeBlock)
             throws IOException {
-        final ByteBuffer compressionBuffer = compressionType.compression(byteBuffer);
+        final ByteBuffer compressionBuffer =
+                compressionType.compression(byteBuffer, compressionBlock);
+        blockSet.compressionBlock(compressionBuffer);
         final int size = compressionBuffer.limit() + BLOCK_HEAD_SIZE;
-        reusedBuffer = reAllocate(reusedBuffer, size);
-        reusedBuffer.putInt(compressionBuffer.limit());
-        reusedBuffer.put(compressionBuffer).flip();
-        this.reusedBuffer = byteBufferTuple.reusedBuffer(reusedBuffer);
-        final int readableCount = writeFull(fileChannel, reusedBuffer);
+        encodeBlock = reAllocate(encodeBlock, size);
+        encodeBlock.putInt(compressionBuffer.limit());
+        encodeBlock.put(compressionBuffer).flip();
+        blockSet.encodeBlock(encodeBlock);
+        final int readableCount = writeFull(fileChannel, encodeBlock);
         readablePosition.addAndGet(readableCount);
         pageCacheUsed += readableCount;
         readable.signalAll();
+    }
+
+    /**
+     * encode block set and writer channel.
+     *
+     * @throws IOException IOException
+     */
+    private void encodeBlockSetAndWriterChannel() throws IOException {
+        blockSet.writeBlock().flip();
+        encodeBlockAndWriteChannel(
+                blockSet.writeBlock(), blockSet.compressionBlock(), blockSet.encodeBlock());
+        blockSet.writeBlock().clear();
     }
 
     /**
@@ -298,10 +310,8 @@ public final class Segment implements Closeable, Comparable<Segment> {
             if (isFinish()) {
                 return;
             }
-            if (writeBlock.position() != 0) {
-                writeBlock.flip();
-                encodeBlockAndWriteChannel(writeBlock, reusedBuffer);
-                writeBlock.clear();
+            if (blockSet.writeBlock().position() != 0) {
+                encodeBlockSetAndWriterChannel();
                 fileChannel.force(true);
             }
             pageCacheUsed = 0;
