@@ -95,7 +95,7 @@ public class IOUtils {
      */
     public static ByteBuffer reAllocate(ByteBuffer oldBuffer, int capacity, int limit) {
 
-        if (oldBuffer == null || oldBuffer.capacity() < capacity) {
+        if (oldBuffer == null || oldBuffer.capacity() < limit) {
             oldBuffer = ByteBuffer.allocateDirect(capacity);
         } else {
             oldBuffer.clear();
